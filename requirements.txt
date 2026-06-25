@@ -1,0 +1,53 @@
+# ── AI Meeting Assistant ── requirements.txt ──────────────────────────────────
+# Python 3.10+ recommended
+
+# ---------------------------------------------------------------------------
+# UI
+# ---------------------------------------------------------------------------
+streamlit>=1.35.0
+
+# ---------------------------------------------------------------------------
+# Audio downloading & processing
+# ---------------------------------------------------------------------------
+yt-dlp>=2024.4.9
+ffmpeg-python>=0.2.0          # Python wrapper for ffmpeg (ffmpeg binary required separately)
+
+# ---------------------------------------------------------------------------
+# Transcription  (OpenAI Whisper — runs fully locally)
+# ---------------------------------------------------------------------------
+openai-whisper>=20231117
+torch>=2.2.0                  # Whisper dependency (CPU build is fine)
+torchaudio>=2.2.0
+
+# ---------------------------------------------------------------------------
+# Translation helper (used inside the pipeline for Hindi → English)
+# ---------------------------------------------------------------------------
+langdetect>=1.0.9
+
+# ---------------------------------------------------------------------------
+# LangChain LCEL + Mistral
+# ---------------------------------------------------------------------------
+langchain>=0.2.0
+langchain-core>=0.2.0
+langchain-community>=0.2.0
+langchain-mistralai>=0.1.0    # LangChain partner package for Mistral
+mistralai>=0.4.0              # Official Mistral SDK (free API tier)
+
+# ---------------------------------------------------------------------------
+# RAG pipeline — embeddings & vector store
+# ---------------------------------------------------------------------------
+chromadb>=0.5.0
+sentence-transformers>=3.0.0  # all-MiniLM-L6-v2 via HuggingFace
+huggingface-hub>=0.23.0
+
+# ---------------------------------------------------------------------------
+# PDF & TXT export
+# ---------------------------------------------------------------------------
+fpdf2>=2.7.9
+
+# ---------------------------------------------------------------------------
+# Utilities
+# ---------------------------------------------------------------------------
+python-dotenv>=1.0.0          # Load MISTRAL_API_KEY from .env
+tiktoken>=0.7.0               # Token counting for LangChain splitters
+numpy>=1.26.0
