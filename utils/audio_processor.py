@@ -24,4 +24,14 @@ def download_audio(youtube_url: str) -> str:
         filename = ydl.prepare_filename(info).replace(".webm", ".wav").replace(".m4a", ".wav")
     return filename
 
-print(download_audio("https://youtu.be/_hdUddANh_o?si=lWg4-Qq2TDgXHofO"))
+data = download_audio("https://youtu.be/_hdUddANh_o?si=lWg4-Qq2TDgXHofO")
+
+def convert_to_wav(input_path:str) -> str:
+    """convert any audio/video file to WAV format using pydub"""
+    output_path=os.path.splitext(input_path)[0]+"_converted.wav"
+    audio=AudioSegment.from_file(input_path)
+    audio = audio.set_channels(1).set_frame_rate(16000)
+    audio.export(output_path,format="wav")
+    return output_path
+
+print(convert_to_wav(data))
