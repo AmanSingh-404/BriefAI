@@ -1,3 +1,4 @@
+from torch import chunk
 from langchain_mistralai import ChatMistralAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -12,3 +13,12 @@ llm = ChatMistralAI(
     mistral_api_key=os.getenv("MISTRAL_API_KEY") ,
     temperature=0.3  
 )
+
+def split_transcript(transcript: str) -> list:
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=3000,
+        chunk_overlap=200
+    )
+
+    return splitter.split_text(transcript)
+    
