@@ -1,3 +1,4 @@
+from langchain_core.prompts import ChatPromptTemplate
 from torch import chunk
 from langchain_mistralai import ChatMistralAI
 from langchain_core.prompts import PromptTemplate
@@ -7,12 +8,12 @@ from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 
 import os
 
-
-llm = ChatMistralAI(
-    model="mistral/mistral-small-latest",
-    mistral_api_key=os.getenv("MISTRAL_API_KEY") ,
-    temperature=0.3  
-)
+def get_llm() :
+    return ChatMistralAI(
+        model="mistral/mistral-small-latest",
+        mistral_api_key=os.getenv("MISTRAL_API_KEY") ,
+        temperature=0.3  
+    )
 
 def split_transcript(transcript: str) -> list:
     splitter = RecursiveCharacterTextSplitter(
@@ -21,4 +22,41 @@ def split_transcript(transcript: str) -> list:
     )
 
     return splitter.split_text(transcript)
+
+def summarize(transcript: str) -> str:
+    llm = get_llm()
+    map_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system","Summarize this portion of a meeting transcript  concisely"),
+            ("human","{text} "),
+        ]
+    )
+    
+    map_chain = map_prompt | llm | StrOutputParser()
+
+    chunks = split_transcript(transcript)
+    
+    chunk_summaries = [map_chain.invoke({"text":chunk}) for chunk in chunks]
+
+    combined = "\n\n".join(chunk_summaries) 
+
+    combined_prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "You are an expert summarizer. Combine these individual summaries into one cohesive and comprehensive summary of the original transcript. The summary should be well-structured, easy to read, and capture all the key points, decisions, and action items from the transcript.",
+            ),
+            (
+                "human",
+                "{text}",
+            ),
+        ]
+    )
+    
+    combined_chain = (
+        RunnablePassthrough() | RunnableLambda(lambda x : {"text" : x}) | combined_prompt | llm | StrOutputParser()
+    )
+    
+    return combined_chain.invoke(combined)
+    
     
