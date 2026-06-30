@@ -40,3 +40,14 @@ def build_vector_store(transcript:str)->Chroma:
     )
 
     return vector_store
+
+def load_vector_store()->Chroma:
+    embeddings = get_embedding()
+    vector_store = Chroma(
+        persist_directory=CHROMA_DIR,
+        collection_name=COLLECTION_NAME,
+        embedding=embeddings
+    )
+    return vector_store
+
+
