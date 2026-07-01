@@ -45,7 +45,35 @@ def run_pipeline(source:str, language:str ="english") -> dict:
         "rag_chain":rag_chain
     }
 
+if __name__=="__main__":
+    
+    #CLI entry point
+    source = input("Enter source path or URL: ").strip()
+    language = input("Enter language (default: english)").strip() or "english"
+    results = run_pipeline(source,language)
+    
+    print("\n" + "=" * 60)
+    print(f"x Title: {results['title']}")
+    print(f"\n Summary:\n{results['summary' ]}")
+    print(f"\n Action Items:\n{results['action_items' ]}")
+    print(f"\n Key Decisions:\n{results['key_decisions' ]}")
+    print(f"\n? Open Questions:\n{results['open_questions' ]}")
+    print("=" * 60)
 
+    rag_chain = results["rag_chain"]
+
+    # Phase 2 - Chat with your meeting via RAG
+    print("\n Chat with your meeting (type 'exit' .to quit) \n")
+    while True:
+        question = input("You: ").strip()
+        if question. lower() in ["exit", "quit", "q"] :
+            print("Thank you for using AI Video Assistant!")
+            break
+
+        if not question:
+            continue
+        answer = ask_question(rag_chain, question)
+        print(f"\n Assistant: {answer}\n")
 
     
     
