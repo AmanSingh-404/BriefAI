@@ -24,11 +24,11 @@ def build_rag_chain(transcript:str):
     retriever = get_retriever(vector_store)
     llm = get_llm()
 
-    prompt = ChatPromptTemplate.from_messages(
-        [(
+    prompt = ChatPromptTemplate.from_messages([
+        (
             "system",
             """You are an expert meeting assistant. Answer the user's question
-            based .ONLY .on .the meeting transcript context provided below.
+            based ONLY on the meeting transcript context provided below.
 
             If the answer is not found in the context, say:
             "I could not find this information in the meeting transcript."
@@ -37,15 +37,15 @@ def build_rag_chain(transcript:str):
 
             Context from meeting transcript:
             {context}""",
-        )
+        ),
         ("human", "{question}"),
     ])
 
     # full LCEL rag pipeline
     rag_chain = (
         {
-            "context": retriever | RunnableLambda(format_docs) ,
-            "question": RunnablePassthrough()
+            "context": (lambda x: x["question"]) | retriever | RunnableLambda(format_docs),
+            "question": (lambda x: x["question"])
         }
         | prompt 
         | llm 
@@ -56,14 +56,14 @@ def build_rag_chain(transcript:str):
 
 def load_rag_chain():
     vector_store = load_vector_store()
-    retriver = get_retriever()
+    retriever = get_retriever(vector_store)
 
     llm = get_llm()
-    prompt = ChatPromptTemplate.from_messages(
-        [(
+    prompt = ChatPromptTemplate.from_messages([
+        (
             "system",
             """You are an expert meeting assistant. Answer the user's question
-            based .ONLY .on .the meeting transcript context provided below.
+            based ONLY on the meeting transcript context provided below.
 
             If the answer is not found in the context, say:
             "I could not find this information in the meeting transcript."
@@ -72,14 +72,14 @@ def load_rag_chain():
 
             Context from meeting transcript:
             {context}""",
-        )
+        ),
         ("human", "{question}"),
     ])
     
     rag_chain = (
         {
-            "context": retriver | RunnableLambda(format_docs) ,
-            "question": RunnablePassthrough()
+            "context": (lambda x: x["question"]) | retriever | RunnableLambda(format_docs),
+            "question": (lambda x: x["question"])
         }
         | prompt 
         | llm 

@@ -3,11 +3,11 @@ import yt_dlp
 from pydub import AudioSegment
 import os
 
-DWONLOAD_DIR = 'downloades' 
-os.makedirs(DWONLOAD_DIR,exist_ok=True)
+DOWNLOAD_DIR = 'downloads' 
+os.makedirs(DOWNLOAD_DIR,exist_ok=True)
 
 def download_audio(youtube_url: str) -> str:
-    output_path = os.path.join(DWONLOAD_DIR,"%(title)s.%(ext)s")
+    output_path = os.path.join(DOWNLOAD_DIR,"%(title)s.%(ext)s")
     
     ydl_opts ={
         'format':"bestaudio/best",
@@ -21,7 +21,9 @@ def download_audio(youtube_url: str) -> str:
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(youtube_url, download=True)
-        filename = ydl.prepare_filename(info).replace(".webm", ".wav").replace(".m4a", ".wav")
+        original_filename = ydl.prepare_filename(info)
+        base, _ = os.path.splitext(original_filename)
+        filename = base + ".wav"
     return filename
 
 

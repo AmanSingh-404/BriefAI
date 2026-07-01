@@ -310,15 +310,53 @@ def render_intake_form():
             st.error(f"Something went wrong while processing: {e}")
 
 
+def _count_items(value) -> int:
+    if not value:
+        return 0
+    if isinstance(value, (list, tuple)):
+        return len(value)
+    if isinstance(value, str):
+        val_lower = value.lower().strip()
+        if any(neg in val_lower for neg in [
+            "no action items found", 
+            "no key decisions found", 
+            "no open questions found"
+        ]):
+            return 0
+        
+        lines = [line.strip() for line in value.split("\n") if line.strip()]
+        
+        # Count lines starting with a number followed by a dot or parenthesis, e.g. "1.", "1)"
+        import re
+        numbered_items = [
+            line for line in lines 
+            if re.match(r'^\d+[\.\)]', line)
+        ]
+        
+        if numbered_items:
+            return len(numbered_items)
+            
+        # If no numbered list, count basic bullet points
+        bullets = [
+            line for line in lines 
+            if line.startswith(("-", "*", "•"))
+        ]
+        if bullets:
+            return len(bullets)
+            
+        return 1 if lines else 0
+    return 1
+
+
 def render_results():
     r = st.session_state.results
 
     st.markdown(f"### {r['title']}")
 
     wc = len(r["transcript"].split())
-    ac = len(r["action_items"]) if isinstance(r["action_items"], (list, tuple)) else 1
-    dc = len(r["key_decisions"]) if isinstance(r["key_decisions"], (list, tuple)) else 1
-    qc = len(r["open_questions"]) if isinstance(r["open_questions"], (list, tuple)) else 1
+    ac = _count_items(r["action_items"])
+    dc = _count_items(r["key_decisions"])
+    qc = _count_items(r["open_questions"])
 
     st.markdown(
         f'<div class="chip-row">'
